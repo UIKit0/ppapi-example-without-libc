@@ -25,6 +25,7 @@ struct nacl_irt_basic {
 };
 
 #define NACL_IRT_FDIO_v0_1      "nacl-irt-fdio-0.1"
+#define NACL_IRT_DEV_FDIO_v0_1  "nacl-irt-dev-fdio-0.1"
 struct nacl_irt_fdio {
   int (*close)(int fd);
   int (*dup)(int fd, int *newfd);

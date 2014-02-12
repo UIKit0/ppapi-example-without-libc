@@ -142,7 +142,7 @@ void _start(uint32_t *info) {
   Elf32_auxv_t *auxv = nacl_startup_auxv(info);
   grok_auxv(auxv);
   DO_QUERY(NACL_IRT_BASIC_v0_1, __libnacl_irt_basic);
-  DO_QUERY(NACL_IRT_FDIO_v0_1, __libnacl_irt_fdio);
+  DO_QUERY(NACL_IRT_DEV_FDIO_v0_1, __libnacl_irt_fdio);
 
   LOG("Hello world!\n");
 
