@@ -75,11 +75,11 @@ typedef size_t (*TYPE_nacl_irt_query)(const char *interface_ident,
 /* From native_client/src/include/elf32.h: */
 
 typedef struct {
-  int a_type;
+  uintptr_t a_type;
   union {
-    int a_val;
+    uintptr_t a_val;
   } a_un;
-} Elf32_auxv_t;
+} Elf_auxv_t;
 
 
 /* From native_client/src/include/elf_auxv.h: */
@@ -97,25 +97,25 @@ enum NaClStartupInfoIndex {
   NACL_STARTUP_ARGV   /* argv[0] pointer.  */
 };
 
-static inline int nacl_startup_argc(const uint32_t info[]) {
+static inline int nacl_startup_argc(const uintptr_t info[]) {
   return info[NACL_STARTUP_ARGC];
 }
 
-static inline char **nacl_startup_argv(const uint32_t *info) {
+static inline char **nacl_startup_argv(const uintptr_t *info) {
   return (char **) &info[NACL_STARTUP_ARGV];
 }
 
-static inline int nacl_startup_envc(const uint32_t info[]) {
+static inline int nacl_startup_envc(const uintptr_t info[]) {
   return info[NACL_STARTUP_ENVC];
 }
 
-static inline char **nacl_startup_envp(const uint32_t *info) {
+static inline char **nacl_startup_envp(const uintptr_t *info) {
   return &nacl_startup_argv(info)[nacl_startup_argc(info) + 1];
 }
 
-static inline Elf32_auxv_t *nacl_startup_auxv(const uint32_t *info) {
+static inline Elf_auxv_t *nacl_startup_auxv(const uintptr_t *info) {
   char **envend = &nacl_startup_envp(info)[nacl_startup_envc(info) + 1];
-  return (Elf32_auxv_t *) envend;
+  return (Elf_auxv_t *) envend;
 }
 
 #endif

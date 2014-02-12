@@ -19,8 +19,8 @@ TYPE_nacl_irt_query __nacl_irt_query;
 static const PPB_Core *ppb_core;
 
 
-static void grok_auxv(const Elf32_auxv_t *auxv) {
-  const Elf32_auxv_t *av;
+static void grok_auxv(const Elf_auxv_t *auxv) {
+  const Elf_auxv_t *av;
   for (av = auxv; av->a_type != AT_NULL; ++av) {
     if (av->a_type == AT_SYSINFO) {
       __nacl_irt_query = (TYPE_nacl_irt_query) av->a_un.a_val;
@@ -87,8 +87,8 @@ static const struct PP_StartFunctions start_funcs = {
   MyPPP_GetInterface,
 };
 
-void _start(uint32_t *info) {
-  Elf32_auxv_t *auxv = nacl_startup_auxv(info);
+void _start(uintptr_t *info) {
+  Elf_auxv_t *auxv = nacl_startup_auxv(info);
   grok_auxv(auxv);
   DO_QUERY(NACL_IRT_BASIC_v0_1, __libnacl_irt_basic);
   DO_QUERY(NACL_IRT_DEV_FDIO_v0_1, __libnacl_irt_fdio);
