@@ -1,0 +1,6 @@
+{
+  "program": {
+    "x86-32": {"url": "ppapi_hellow.nexe.x86-32"},
+    "x86-64": {"url": "ppapi_hellow.nexe.x86-64"}
+  }
+}
