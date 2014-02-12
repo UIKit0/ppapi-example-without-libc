@@ -31,6 +31,7 @@ def Run(server_address,
 
 
 if __name__ == '__main__':
+  os.chdir('out')
   if len(sys.argv) > 1:
     Run((SERVER_HOST, int(sys.argv[1])))
   else:

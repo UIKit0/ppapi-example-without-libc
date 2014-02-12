@@ -4,6 +4,10 @@ set -eu
 
 ppapi_dir=~/devel/newgit-chromium/src
 
+mkdir -p out
+
+cp ppapi_hellow.html ppapi_hellow.nmf out
+
 # This doesn't work with normal PNaCl because the PPAPI shims aren't present.
 
 # pnacl-clang -O2 -Wall -I$ppapi_dir ppapi_hellow.c -o ppapi_hellow.pexe -s
@@ -11,4 +15,4 @@ ppapi_dir=~/devel/newgit-chromium/src
 #     --allow-llvm-bitcode-input
 
 nacl x86_64-nacl-gcc -O2 -Wall -I$ppapi_dir ppapi_hellow.c -nostdlib \
-    -o ppapi_hellow.nexe.x86-64
+    -o out/ppapi_hellow.nexe.x86-64
