@@ -81,12 +81,6 @@ static const void *MyPPP_GetInterface(const char *interface_name) {
   return NULL;
 }
 
-static const struct PP_StartFunctions start_funcs = {
-  MyPPP_InitializeModule,
-  MyPPP_ShutdownModule,
-  MyPPP_GetInterface,
-};
-
 void _start(uintptr_t *info) {
   Elf_auxv_t *auxv = nacl_startup_auxv(info);
   grok_auxv(auxv);
@@ -97,6 +91,13 @@ void _start(uintptr_t *info) {
 
   struct nacl_irt_ppapihook ppapihook;
   DO_QUERY(NACL_IRT_PPAPIHOOK_v0_1, ppapihook);
+  /* This is local as a workaround to avoid having to apply
+   * relocations to global variables. */
+  struct PP_StartFunctions start_funcs = {
+    MyPPP_InitializeModule,
+    MyPPP_ShutdownModule,
+    MyPPP_GetInterface,
+  };
   ppapihook.ppapi_start(&start_funcs);
 
   LOG("ppapi_start() returned\n");
