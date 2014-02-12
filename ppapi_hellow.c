@@ -10,7 +10,6 @@
 #include "irt_ppapi.h"
 #include "ppapi/c/pp_errors.h"
 #include "ppapi/c/ppb_core.h"
-#include "ppapi/c/ppp_instance.h"
 
 
 struct nacl_irt_basic __libnacl_irt_basic;
@@ -52,57 +51,9 @@ static size_t my_strlen(const char *s) {
   return n;
 }
 
-static int my_strcmp(const char *a, const char *b) {
-  while (*a == *b) {
-    if (*a == '\0')
-      return 0;
-    ++a;
-    ++b;
-  }
-  return (int) (unsigned char) *a - (int) (unsigned char) *b;
-}
-
 static void log_string(const char *string) {
   do_write(string, my_strlen(string));
 }
-
-
-static PP_Bool DidCreate(PP_Instance instance,
-                         uint32_t argc,
-                         const char* argn[],
-                         const char* argv[]) {
-  LOG("In DidCreate\n");
-  return 1;
-}
-
-static void DidDestroy(PP_Instance instance) {
-  LOG("In DidDestroy\n");
-}
-
-static void DidChangeView(PP_Instance instance,
-                          const struct PP_Rect* position,
-                          const struct PP_Rect* clip) {
-  LOG("In DidChangeView\n");
-}
-
-static void DidChangeFocus(PP_Instance instance, PP_Bool has_focus) {
-  LOG("In DidChangeFocus\n");
-}
-
-static PP_Bool HandleDocumentLoad(PP_Instance instance,
-                                  PP_Resource url_loader) {
-  LOG("In HandleDocumentLoad\n");
-  return 0;
-}
-
-static struct PPP_Instance_1_0 ppp_instance = {
-  DidCreate,
-  DidDestroy,
-  DidChangeView,
-  DidChangeFocus,
-  HandleDocumentLoad,
-};
-
 
 static void Callback(void *data, int32_t result) {
   LOG("In Callback\n");
@@ -127,8 +78,6 @@ static const void *MyPPP_GetInterface(const char *interface_name) {
   LOG("In PPP_GetInterface\n");
   log_string(interface_name);
   log_string("\n");
-  if (my_strcmp(interface_name, PPP_INSTANCE_INTERFACE_1_0) == 0)
-    return &ppp_instance;
   return NULL;
 }
 
