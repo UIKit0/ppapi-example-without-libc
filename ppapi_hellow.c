@@ -114,7 +114,7 @@ static struct PPP_Messaging_1_0 ppp_messaging;
 
 
 static void Callback(void *data, int32_t result) {
-  LOG("In Callback\n");
+  LOG("In Callback(), called via CallOnMainThread()\n");
   ppb_core->CallOnMainThread(
       1000, PP_MakeCompletionCallback(Callback, NULL), 0);
 }
@@ -125,7 +125,8 @@ static int32_t MyPPP_InitializeModule(PP_Module module_id,
 
   ppb_core = get_browser_interface(PPB_CORE_INTERFACE);
   ppb_var = get_browser_interface(PPB_VAR_INTERFACE_1_0);
-  Callback(NULL, 0);
+  ppb_core->CallOnMainThread(
+      1000, PP_MakeCompletionCallback(Callback, NULL), 0);
   return PP_OK;
 }
 

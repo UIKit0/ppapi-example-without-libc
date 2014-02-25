@@ -8,7 +8,7 @@ Hello world NaCl example.  Writes to stdout, so nothing appears here.
 <script>
 function run() {
   var plugin = document.getElementById("plugin");
-  plugin.postMessage("Message from Javascript to NaCl\n");
+  plugin.postMessage("Message from Javascript to NaCl, via postMessage()\n");
   console.log("msg");
   window.setTimeout(run, 1000);
 }
