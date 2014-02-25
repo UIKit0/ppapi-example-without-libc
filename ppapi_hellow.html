@@ -1,5 +1,16 @@
 
 Hello world NaCl example.  Writes to stdout, so nothing appears here.
 
-<embed type="application/x-nacl" src="ppapi_hellow.nmf" width="0" height="0">
+<embed type="application/x-nacl" src="ppapi_hellow.nmf"
+    width="0" height="0" id="plugin">
 </embed>
+
+<script>
+function run() {
+  var plugin = document.getElementById("plugin");
+  plugin.postMessage("Message from Javascript to NaCl\n");
+  console.log("msg");
+  window.setTimeout(run, 1000);
+}
+run()
+</script>

@@ -10,6 +10,9 @@
 #include "irt_ppapi.h"
 #include "ppapi/c/pp_errors.h"
 #include "ppapi/c/ppb_core.h"
+#include "ppapi/c/ppb_var.h"
+#include "ppapi/c/ppp_instance.h"
+#include "ppapi/c/ppp_messaging.h"
 
 
 struct nacl_irt_basic __libnacl_irt_basic;
@@ -17,6 +20,7 @@ struct nacl_irt_fdio __libnacl_irt_fdio;
 TYPE_nacl_irt_query __nacl_irt_query;
 
 static const PPB_Core *ppb_core;
+static const struct PPB_Var_1_0 *ppb_var;
 
 
 static void grok_auxv(const Elf_auxv_t *auxv) {
@@ -51,9 +55,63 @@ static size_t my_strlen(const char *s) {
   return n;
 }
 
+static int my_strcmp(const char *a, const char *b) {
+  while (*a == *b) {
+    if (*a == '\0')
+      return 0;
+    ++a;
+    ++b;
+  }
+  return (int) (unsigned char) *a - (int) (unsigned char) *b;
+}
+
 static void log_string(const char *string) {
   do_write(string, my_strlen(string));
 }
+
+
+static PP_Bool DidCreate(PP_Instance instance,
+                         uint32_t argc,
+                         const char* argn[],
+                         const char* argv[]) {
+  LOG("In DidCreate\n");
+  return 1;
+}
+
+static void DidDestroy(PP_Instance instance) {
+  LOG("In DidDestroy\n");
+}
+
+static void DidChangeView(PP_Instance instance,
+                          const struct PP_Rect* position,
+                          const struct PP_Rect* clip) {
+  LOG("In DidChangeView\n");
+}
+
+static void DidChangeFocus(PP_Instance instance, PP_Bool has_focus) {
+  LOG("In DidChangeFocus\n");
+}
+
+static PP_Bool HandleDocumentLoad(PP_Instance instance,
+                                  PP_Resource url_loader) {
+  LOG("In HandleDocumentLoad\n");
+  return 0;
+}
+
+static struct PPP_Instance_1_0 ppp_instance;
+
+static void HandleMessage(PP_Instance instance, struct PP_Var message) {
+  LOG("In HandleMessage\n");
+  if (message.type == PP_VARTYPE_STRING && ppb_var != NULL) {
+    LOG("Received: ");
+    uint32_t len;
+    const char *string = ppb_var->VarToUtf8(message, &len);
+    do_write(string, len);
+  }
+}
+
+static struct PPP_Messaging_1_0 ppp_messaging;
+
 
 static void Callback(void *data, int32_t result) {
   LOG("In Callback\n");
@@ -66,6 +124,7 @@ static int32_t MyPPP_InitializeModule(PP_Module module_id,
   LOG("In PPP_InitializeModule\n");
 
   ppb_core = get_browser_interface(PPB_CORE_INTERFACE);
+  ppb_var = get_browser_interface(PPB_VAR_INTERFACE_1_0);
   Callback(NULL, 0);
   return PP_OK;
 }
@@ -78,6 +137,10 @@ static const void *MyPPP_GetInterface(const char *interface_name) {
   LOG("In PPP_GetInterface\n");
   log_string(interface_name);
   log_string("\n");
+  if (my_strcmp(interface_name, PPP_INSTANCE_INTERFACE_1_0) == 0)
+    return &ppp_instance;
+  if (my_strcmp(interface_name, PPP_MESSAGING_INTERFACE_1_0) == 0)
+    return &ppp_messaging;
   return NULL;
 }
 
@@ -98,6 +161,20 @@ void _start(uintptr_t *info) {
     MyPPP_ShutdownModule,
     MyPPP_GetInterface,
   };
+  /* Similarly, initialise some global variables, avoiding relocations. */
+  struct PPP_Instance_1_0 local_ppp_instance = {
+    DidCreate,
+    DidDestroy,
+    DidChangeView,
+    DidChangeFocus,
+    HandleDocumentLoad,
+  };
+  ppp_instance = local_ppp_instance;
+  struct PPP_Messaging_1_0 local_ppp_messaging = {
+    HandleMessage,
+  };
+  ppp_messaging = local_ppp_messaging;
+
   ppapihook.ppapi_start(&start_funcs);
 
   LOG("ppapi_start() returned\n");
