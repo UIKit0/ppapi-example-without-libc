@@ -19,7 +19,7 @@ cp ppapi_hellow.html ppapi_hellow.nmf out-nonsfi
 nacl x86_64-nacl-gcc -O2 -Wall -I$ppapi_dir ppapi_hellow.c -nostdlib \
     -o out/ppapi_hellow.nexe.x86-64
 
-gcc -Wall -I$ppapi_dir -I$HOME/devel/linux-syscall-support/lss \
+gcc -Wall -I$ppapi_dir \
     ppapi_hellow.c \
     -nostdlib -shared -fPIC -fvisibility=hidden \
     -o out-nonsfi/ppapi_hellow.nexe.x86-64
